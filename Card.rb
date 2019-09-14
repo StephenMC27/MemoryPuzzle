@@ -4,7 +4,7 @@ class Card
 
   def initialize
     @face_value = ("A".."Z").to_a.sample  #sets @face_value to random capital letter
-    @face_up = true   #each card starts face up at beginning of game
+    @face_up = false   #each card starts face down at beginning of game
   end
 
   def display_card   #only shows card's face value when @face_up == true
