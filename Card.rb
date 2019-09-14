@@ -1,10 +1,8 @@
-require "byebug"
 class Card
 
   attr_reader :face_value
 
   def initialize(face_value)
-    #debugger
     @face_value = face_value  #sets @face_value to argument (string)
     @face_up = false   #each card starts face up at beginning of game
   end
