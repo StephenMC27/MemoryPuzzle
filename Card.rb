@@ -1,15 +1,15 @@
 class Card
 
-  attr_reader :face_value
-
   def initialize(face_value)
     @face_value = face_value  #sets @face_value to argument (string)
     @face_up = false   #each card starts face up at beginning of game
   end
 
-  def display_card   #only shows card's face value when @face_up == true
+  def display_value   #only shows card's face value when @face_up == true
     if @face_up
-      puts @face_value
+      print @face_value
+    else
+      print " "
     end
   end
 
