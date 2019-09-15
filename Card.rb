@@ -1,5 +1,7 @@
 class Card
 
+  attr_reader :face_value, :face_up
+
   def initialize(face_value)
     @face_value = face_value  #sets @face_value to argument (string)
     @face_up = false   #each card starts face up at beginning of game
