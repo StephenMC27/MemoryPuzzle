@@ -13,10 +13,45 @@ class Game
   end
 
   def play
+    board.populate
     until board.won?
-      make_guess
-
+      system("clear")
+      board.render
+      previously_guessed_pos = get_guess
+      while board[previously_guessed_pos].face_up
+        puts "That card is already face up! Try again."
+        sleep(1.5)
+        system("clear")
+        board.render
+        previously_guessed_pos = get_guess
+      end
+      previous_card = board[previously_guessed_pos]
+      previous_card.reveal
+      system("clear")
+      board.render
+      currently_guessed_position = get_guess
+      while board[currently_guessed_position].face_up
+        puts "That card is already face up! Try again."
+        sleep(1.5)
+        system("clear")
+        board.render
+        currently_guessed_position = get_guess
+      end
+      current_card = board[currently_guessed_position]
+      current_card.reveal
+      system("clear")
+      board.render
+      if board[previously_guessed_pos] == board[currently_guessed_position]
+        puts "It's a match!"
+      else
+        puts "Not a match. Try again."
+        previous_card.hide
+        current_card.hide
+        previously_guessed_pos = nil
+      end
+      sleep(2)
     end
+    puts "You win!"
   end
 
   def get_guess
@@ -56,5 +91,5 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   game = Game.new
-  p game.get_guess
+  game.play
 end
