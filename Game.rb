@@ -17,39 +17,22 @@ class Game
     until board.won?
       system("clear")
       board.render
+
       previously_guessed_pos = get_guess
-      while board[previously_guessed_pos].face_up
-        puts "That card is already face up! Try again."
-        sleep(1.5)
-        system("clear")
-        board.render
-        previously_guessed_pos = get_guess
-      end
-      previous_card = board[previously_guessed_pos]
-      previous_card.reveal
+      previous_card = make_guess(previously_guessed_pos)
       system("clear")
       board.render
+
       currently_guessed_position = get_guess
-      while board[currently_guessed_position].face_up
-        puts "That card is already face up! Try again."
-        sleep(1.5)
-        system("clear")
-        board.render
-        currently_guessed_position = get_guess
-      end
-      current_card = board[currently_guessed_position]
-      current_card.reveal
+      current_card = make_guess(currently_guessed_position)
       system("clear")
       board.render
-      if board[previously_guessed_pos] == board[currently_guessed_position]
-        puts "It's a match!"
-      else
-        puts "Not a match. Try again."
-        previous_card.hide
-        current_card.hide
-        previously_guessed_pos = nil
-      end
+
+      is_a_match?(previous_card, current_card)
+
       sleep(2)
+      system("clear")
+      board.render
     end
     puts "You win!"
   end
@@ -58,11 +41,25 @@ class Game
     puts "Please enter the position of the card you would like to flip (e.g., '2,3')"
     guess = gets.chomp
     while !is_valid_input?(guess)
-      puts
       puts "Your guess must be two integers separated by a comma. Please try again."
       guess = gets.chomp
     end
     format_guess(guess)
+  end
+
+  def make_guess(pos)
+    loop do
+      if board[pos].face_up
+        puts "That card is already face up! Try again."
+        sleep(1.5)
+        system("clear")
+        board.render
+        pos = get_guess
+      else
+        board[pos].reveal
+        return board[pos]
+      end
+    end
   end
 
   def is_valid_input?(guess)
@@ -75,6 +72,17 @@ class Game
       false
     else
       true
+    end
+  end
+
+  def is_a_match?(previous_card, current_card)
+    if previous_card == current_card
+      puts "It's a match!"
+    else
+      puts "Not a match. Try again."
+      previous_card.hide
+      current_card.hide
+      previously_guessed_pos = nil
     end
   end
 
