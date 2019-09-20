@@ -1,13 +1,16 @@
 require_relative "Card"
 require_relative "Board"
+require_relative "HumanPlayer"
+require_relative "ComputerPlayer"
 require "byebug"
 
 class Game
 
-  attr_reader :board
+  attr_reader :board, :player
   attr_accessor :previously_guessed_pos
 
-  def initialize
+  def initialize(playerClass)
+    @player = playerClass.new(4)
     @board = Board.new(4)
     @previously_guessed_pos = nil
   end
@@ -17,18 +20,19 @@ class Game
     until board.won?
       system("clear")
       board.render
-
-      previously_guessed_pos = get_guess
-      previous_card = make_guess(previously_guessed_pos)
+      previously_guessed_pos = player.first_guess
+      formatted_previous_position = make_guess(previously_guessed_pos, player)
+      sleep(2)
       system("clear")
       board.render
 
-      currently_guessed_position = get_guess
-      current_card = make_guess(currently_guessed_position)
+      currently_guessed_position = player.second_guess(formatted_previous_position)
+      formatted_current_position = make_guess(currently_guessed_position, player)
+      sleep(2)
       system("clear")
       board.render
 
-      is_a_match?(previous_card, current_card)
+      is_a_match?(formatted_previous_position, formatted_current_position)
 
       sleep(2)
       system("clear")
@@ -37,67 +41,48 @@ class Game
     puts "You win!"
   end
 
-  def get_guess
-    puts "Please enter the position of the card you would like to flip (e.g., '2,3')"
-    guess = gets.chomp
-    while !is_valid_input?(guess)
-      puts "Your guess must be two integers separated by a comma. Please try again."
-      guess = gets.chomp
-    end
-    format_guess(guess)
-  end
-
-  def make_guess(pos)
-    loop do
-      if board[pos].face_up
-        puts "That card is already face up! Try again."
-        sleep(1.5)
-        system("clear")
-        board.render
-        pos = get_guess
-      else
-        board[pos].reveal
-        return board[pos]
+  def make_guess(pos, player)
+    if player.is_a?(HumanPlayer)
+      loop do
+        if pos.any? { |el| el < 0 || el >= board.dimension }
+          puts "That is not a valid board position!"
+          sleep(1.5)
+          system("clear")
+          board.render
+          pos = player.get_guess
+        elsif board[pos].face_up
+          puts "That card is already face up! Try again."
+          sleep(1.5)
+          system("clear")
+          board.render
+          pos = player.get_guess
+        else
+          board[pos].reveal
+          return pos
+        end
       end
-    end
-  end
-
-  def is_valid_input?(guess)
-    if guess.length != 3 || !guess.include?(",")
-      return false
-    end
-    begin
-      format_guess(guess)
-    rescue
-      false
     else
-      true
+      board[pos].reveal
+      player.receive_revealed_card(board[pos].face_value, pos)
+      return pos
     end
   end
 
-  def is_a_match?(previous_card, current_card)
-    if previous_card == current_card
+  def is_a_match?(previous_position, current_position)
+    if board[previous_position] == board[current_position]
+      player.receive_match(previous_position, current_position)
       puts "It's a match!"
     else
       puts "Not a match. Try again."
-      previous_card.hide
-      current_card.hide
+      board[previous_position].hide
+      board[current_position].hide
       previously_guessed_pos = nil
     end
-  end
-
-  def format_guess(guess)
-    alpha = ("a".."z").to_a + ("A".."Z").to_a
-    formatted = guess.split(",")
-    if formatted.any? { |el| alpha.include?(el) }
-      raise InputError
-    end
-    formatted.map(&:to_i)
   end
 
 end
 
 if __FILE__ == $PROGRAM_NAME
-  game = Game.new
+  game = Game.new(ComputerPlayer)
   game.play
 end

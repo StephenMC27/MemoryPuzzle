@@ -2,7 +2,7 @@ require_relative "Card.rb"
 #require "byebug"
 class Board
 
-  attr_reader :cards #reader method for @cards instance variable
+  attr_reader :cards, :dimension #reader method for @cards instance variable
 
   def initialize(dimension)  #Integer === dimension and must be even
     @dimension = dimension  #length of rows/columns
@@ -21,7 +21,7 @@ class Board
   end
 
   def won?  #checks to see if all cards on @grid have been revealed
-    cards.all? {|card| card.face_up == true }
+    cards.all? { |card| card.face_up == true }
   end
 
   def create_cards
@@ -81,9 +81,3 @@ class Board
   end
 
 end
-
-# board = Board.new(4)
-# board.populate
-# board.render
-# board.reveal_card([2,3])
-# board.render

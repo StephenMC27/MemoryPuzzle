@@ -8,8 +8,8 @@ class Card
   end
 
   def display_value   #only shows card's face value when @face_up == true
-    if @face_up
-      print @face_value
+    if face_up
+      print face_value
     else
       print " "
     end
