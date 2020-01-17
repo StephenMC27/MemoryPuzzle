@@ -12,7 +12,7 @@ class ComputerPlayer
     known_cards.values do |val|
       if known_cards.values.count(val) == 2
         matching_positions = known_cards.keys.select { |key| known_cards[key] == val }
-        return matching_positions[1]
+        return matching_positions[0]
       end
     end
     possible_positions.sample
